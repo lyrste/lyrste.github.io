@@ -22,86 +22,148 @@ layout: null
             ]
           })"></script>
 
-  <!-- Minimal light/dark themes -->
+  <!-- Light/dark theme + layout -->
   <style>
     :root {
       --bg: #ffffff;
       --fg: #111111;
       --link: #2958d9;
+      --border: #e0e0e0;
     }
     body.dark {
       --bg: #0e1117;
       --fg: #d6d9df;
       --link: #79a6ff;
+      --border: #2a2f3a;
+    }
+    * {
+      box-sizing: border-box;
     }
     body {
+      margin: 0;
+      padding: 0;
       background: var(--bg);
       color: var(--fg);
-      margin: 0;
-      font-family: system-ui, sans-serif;
-      display: flex;
-      height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+                   sans-serif;
+      line-height: 1.6;
     }
-    nav {
-      width: 240px;
-      border-right: 1px solid #ccc;
-      padding: 1rem;
-      overflow-y: auto;
-    }
-    nav a {
-      display: block;
-      margin-bottom: 0.3rem;
+    a {
       color: var(--link);
       text-decoration: none;
     }
-    nav a:hover {
+    a:hover {
       text-decoration: underline;
     }
-    main {
-      flex: 1;
-      padding: 2rem;
-      overflow-y: auto;
+    .page-wrapper {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 1rem 2rem;
     }
-    .dark-toggle {
-      cursor: pointer;
-      margin-bottom: 1rem;
+    header.site-header {
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1.5rem;
+    }
+    .header-inner {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0.6rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .site-title {
+      font-size: 1rem;
+      font-weight: 500;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+    }
+    .site-title a {
+      text-decoration: none;
+    }
+    .site-title a:hover {
+      text-decoration: underline;
+    }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
       font-size: 0.9rem;
-      opacity: 0.8;
     }
-    .dark-toggle:hover {
-      opacity: 1;
+    button.dark-toggle {
+      border: 1px solid var(--border);
+      background: transparent;
+      color: inherit;
+      border-radius: 999px;
+      padding: 0.25rem 0.7rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+    button.dark-toggle:hover {
+      background: rgba(0,0,0,0.04);
+    }
+    body.dark button.dark-toggle:hover {
+      background: rgba(255,255,255,0.06);
+    }
+    main {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+    main h1:first-of-type {
+      margin-top: 0;
     }
   </style>
 </head>
-
 <body>
-  <!-- Sidebar -->
-  <nav>
-    <div class="dark-toggle" id="toggle-theme">🌓 Toggle Dark Mode</div>
-    <h4>Pages</h4>
-    {% assign pages_list = site.pages | sort: "path" %}
-    {% for p in pages_list %}
-      {% if p.url != "/" and p.url contains ".html" %}
-        <a href="{{ p.url | relative_url }}">{{ p.title | default: p.url }}</a>
-      {% endif %}
-    {% endfor %}
-  </nav>
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="site-title">
+        <a href="{{ '/' | relative_url }}">Home</a>
+        {% if page.title and page.url != "/" %}
+          <span>›</span>
+          <span>{{ page.title }}</span>
+        {% endif %}
+      </div>
+      <div class="header-right">
+        <button class="dark-toggle" id="toggle-theme">🌓 Dark</button>
+      </div>
+    </div>
+  </header>
 
-  <!-- Main content -->
-  <main>
-    <h1>{{ page.title }}</h1>
-    {{ content }}
-  </main>
+  <div class="page-wrapper">
+    <main>
+      {% unless page.url == "/" %}
+        <h1>{{ page.title }}</h1>
+      {% endunless %}
+      {{ content }}
+    </main>
+  </div>
 
-<script>
-  // Dark mode persistence
-  const body = document.body;
-  const saved = localStorage.getItem("theme");
-  if (saved === "dark") body.classList.add("dark");
-  document.getElementById("toggle-theme").onclick = () => {
-    body.classList.toggle("dark");
-    localStorage.setItem("theme", body.classList.contains("dark") ? "dark" : "light");
-  };
-</script>
+  <script>
+    // Dark mode persistence
+    (function() {
+      const body = document.body;
+      const saved = localStorage.getItem("theme");
+      if (saved === "dark") {
+        body.classList.add("dark");
+      }
+      const btn = document.getElementById("toggle-theme");
+      if (btn) {
+        const updateLabel = () => {
+          btn.textContent = body.classList.contains("dark") ? "🌓 Light" : "🌓 Dark";
+        };
+        updateLabel();
+        btn.addEventListener("click", () => {
+          body.classList.toggle("dark");
+          localStorage.setItem("theme", body.classList.contains("dark") ? "dark" : "light");
+          updateLabel();
+        });
+      }
+    })();
+  </script>
 </body>
 </html>
