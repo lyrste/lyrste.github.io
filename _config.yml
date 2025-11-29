@@ -1,0 +1,6 @@
+title: "My notes"
+markdown: kramdown
+kramdown:
+  input: GFM
+  math_engine: katex
+theme: null
