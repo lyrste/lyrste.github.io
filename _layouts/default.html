@@ -8,28 +8,6 @@ layout: null
   <title>{{ page.title | default: site.title }}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- Minimal style -->
-  <style>
-    body {
-      max-width: 800px;
-      margin: 2rem auto;
-      padding: 0 1rem;
-      font-family: system-ui, sans-serif;
-      line-height: 1.6;
-    }
-    nav {
-      margin-bottom: 2rem;
-      font-size: 0.9rem;
-    }
-    nav a {
-      margin-right: 1rem;
-      text-decoration: none;
-    }
-    nav a:hover {
-      text-decoration: underline;
-    }
-  </style>
-
   <!-- KaTeX -->
   <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
@@ -42,15 +20,88 @@ layout: null
               {left: '%%', right: '%%', display: true},
               {left: '$', right: '$', display: false}
             ]
-          });">
-  </script>
+          })"></script>
+
+  <!-- Minimal light/dark themes -->
+  <style>
+    :root {
+      --bg: #ffffff;
+      --fg: #111111;
+      --link: #2958d9;
+    }
+    body.dark {
+      --bg: #0e1117;
+      --fg: #d6d9df;
+      --link: #79a6ff;
+    }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      display: flex;
+      height: 100vh;
+    }
+    nav {
+      width: 240px;
+      border-right: 1px solid #ccc;
+      padding: 1rem;
+      overflow-y: auto;
+    }
+    nav a {
+      display: block;
+      margin-bottom: 0.3rem;
+      color: var(--link);
+      text-decoration: none;
+    }
+    nav a:hover {
+      text-decoration: underline;
+    }
+    main {
+      flex: 1;
+      padding: 2rem;
+      overflow-y: auto;
+    }
+    .dark-toggle {
+      cursor: pointer;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+    .dark-toggle:hover {
+      opacity: 1;
+    }
+  </style>
 </head>
+
 <body>
+  <!-- Sidebar -->
   <nav>
-    <a href="{{ '/' | relative_url }}">Home</a>
-    <a href="{{ '/math.html' | relative_url }}">Math</a>
+    <div class="dark-toggle" id="toggle-theme">🌓 Toggle Dark Mode</div>
+    <h4>Pages</h4>
+    {% assign pages_list = site.pages | sort: "path" %}
+    {% for p in pages_list %}
+      {% if p.url != "/" and p.url contains ".html" %}
+        <a href="{{ p.url | relative_url }}">{{ p.title | default: p.url }}</a>
+      {% endif %}
+    {% endfor %}
   </nav>
 
-  {{ content }}
+  <!-- Main content -->
+  <main>
+    <h1>{{ page.title }}</h1>
+    {{ content }}
+  </main>
+
+<script>
+  // Dark mode persistence
+  const body = document.body;
+  const saved = localStorage.getItem("theme");
+  if (saved === "dark") body.classList.add("dark");
+  document.getElementById("toggle-theme").onclick = () => {
+    body.classList.toggle("dark");
+    localStorage.setItem("theme", body.classList.contains("dark") ? "dark" : "light");
+  };
+</script>
 </body>
 </html>
